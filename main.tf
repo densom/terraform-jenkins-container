@@ -14,6 +14,14 @@ resource "azurerm_storage_share" "example" {
   quota                = 50
 }
 
+
+resource "azurerm_storage_share" "git-server-share" {
+  name                 = "gitserver-test-share"
+  resource_group_name  = "${data.azurerm_resource_group.example.name}"
+  storage_account_name = "${azurerm_storage_account.example.name}"
+  quota                = 50
+}
+
 resource "azurerm_container_group" "jenkins-container" {
   name                = "jenkins-container"
   location            = "${data.azurerm_resource_group.example.location}"
@@ -34,8 +42,8 @@ resource "azurerm_container_group" "jenkins-container" {
     }
 
     ports {
-        port = 50000
-        protocol = "TCP"
+      port     = 50000
+      protocol = "TCP"
     }
 
     volume {
@@ -48,4 +56,28 @@ resource "azurerm_container_group" "jenkins-container" {
       storage_account_key  = "${azurerm_storage_account.example.primary_access_key}"
     }
   }
+  container {
+    name   = "git-server-sandbox"
+    image  = "lerenn/git-server:latest"
+    cpu    = "0.5"
+    memory = "1.0"
+
+    ports {
+      port     = 22
+      protocol = "TCP"
+    }
+
+    volume {
+      name       = "var-git"
+      mount_path = "/var/git"
+      read_only  = false
+      share_name = "${azurerm_storage_share.git-server-share.name}"
+
+      storage_account_name = "${azurerm_storage_account.example.name}"
+      storage_account_key  = "${azurerm_storage_account.example.primary_access_key}"
+    }
+  }
+
+
+
 }
