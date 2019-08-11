@@ -19,12 +19,13 @@ resource "azurerm_container_group" "jenkins-container" {
   location            = "${data.azurerm_resource_group.example.location}"
   resource_group_name = "${data.azurerm_resource_group.example.name}"
   ip_address_type     = "public"
+  dns_name_label      = "jenkins-sandbox-das"
   os_type             = "Linux"
 
   container {
     name   = "jenkins-sandbox"
     image  = "jenkins/jenkins:lts"
-    cpu    = "0.5"
+    cpu    = "1.5"
     memory = "1.5"
 
     ports {
