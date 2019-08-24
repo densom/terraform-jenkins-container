@@ -78,6 +78,8 @@ resource "azurerm_container_group" "jenkins-container" {
     }
   }
 
-
-
+  tags = {
+    Project = "Global Color",
+    subProject = "JenkinsLab"
+  }
 }
